@@ -26,9 +26,9 @@ RUN pip3 install pyrealsense2
 WORKDIR /code
 RUN DEBIAN_FRONTEND=noninteractive apt install -y tzdata
 RUN apt install -y libopencv-dev libpcl-dev
-# RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 # Finally, specify the command we should run when the app is launched
 WORKDIR /code
 RUN chmod +x launch.sh
-CMD ["/bin/bash", launch.sh"]
+CMD ["/bin/bash", "launch.sh"]

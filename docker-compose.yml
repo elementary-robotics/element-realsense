@@ -12,7 +12,7 @@ services:
           nocopy: true
     command: ./launch.sh
 
-  element:
+  realsense:
     build:
       context: .
       dockerfile: Dockerfile
@@ -24,6 +24,7 @@ services:
           nocopy: true
     depends_on:
       - "nucleus"
+    privileged: true
     command: tail -f /dev/null
 
 volumes:
