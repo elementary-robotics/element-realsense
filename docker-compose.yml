@@ -1,0 +1,33 @@
+version: "3.2"
+
+services:
+
+  nucleus:
+    image: elementaryrobotics/nucleus
+    volumes:
+      - type: volume
+        source: shared
+        target: /shared
+        volume:
+          nocopy: true
+    command: ./launch.sh
+
+  element:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - type: volume
+        source: shared
+        target: /shared
+        volume:
+          nocopy: true
+    depends_on:
+      - "nucleus"
+    command: tail -f /dev/null
+
+volumes:
+  shared:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
