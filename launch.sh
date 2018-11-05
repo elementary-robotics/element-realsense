@@ -1,3 +1,3 @@
-#/bin/bash
+#bin/bash
 
-python3 realsense.py
+python3 src/realsense.py
