@@ -25,7 +25,6 @@ services:
     depends_on:
       - "nucleus"
     privileged: true
-    command: tail -f /dev/null
 
 volumes:
   shared:
