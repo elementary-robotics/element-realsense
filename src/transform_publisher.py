@@ -1,7 +1,7 @@
 import os
 import subprocess
 import time
-from multiprocessing import Process
+import threading
 from atom import Element
 from atom.messages import Response
 
@@ -46,9 +46,9 @@ if __name__ == "__main__":
 
     element = Element("realsense")
     element.command_add("calculate_transform", run_transform_estimator, timeout=2000)
+    t = threading.Thread(target=element.command_loop, daemon=True)
+    t.start()
 
-    p = Process(target=element.command_loop)
-    p.start()
     try:
         while True:
             start_time = time.time()
@@ -68,6 +68,4 @@ if __name__ == "__main__":
             time.sleep(max(1/FPS - (time.time() - start_time), 0))
 
     finally:
-        p.terminate()
-        p.join()
         del element
