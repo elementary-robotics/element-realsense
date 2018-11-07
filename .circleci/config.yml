@@ -13,12 +13,12 @@ jobs:
     environment:
 
       # Info on where to push the build in Dockerhub
-      DOCKERHUB_ORG: myorg
-      DOCKERHUB_REPO: myrepo
+      DOCKERHUB_ORG: elementaryrobotics
+      DOCKERHUB_REPO: element-realsense
 
       # Name of the service in docker-compose.yml
-      DOCKER_COMPOSE_PROJECT_NAME: myatom
-      DOCKER_COMPOSE_SERVICE_NAME: myelement
+      DOCKER_COMPOSE_PROJECT_NAME: realsense
+      DOCKER_COMPOSE_SERVICE_NAME: realsense
 
     steps:
       - checkout
@@ -27,11 +27,6 @@ jobs:
       - run:
           name: Docker login
           command: echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USER} --password-stdin
-
-      # Need to update submodules
-      - run:
-          name: Update Submodules
-          command: git submodule update --init --recursive
 
       #
       # Build docker image
