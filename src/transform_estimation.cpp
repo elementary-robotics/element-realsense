@@ -17,7 +17,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/registration/transformation_estimation_svd.h>
 
-static const std::string REALSENSE_SKILL = "realsense";
+static const std::string REALSENSE_ELEMENT = "realsense";
 static const std::string COLOR_STREAM = "color";
 static const std::string PC_STREAM = "pointcloud";
 static const std::string FILE_PATH = "data/transform.csv";
@@ -214,7 +214,7 @@ std::vector<uint8_t> get_realsense_data(
     struct element_entry_read_info info;
     struct redis_xread_kv_item entry_items[1];
     struct frame_data frame;
-    info.element = REALSENSE_SKILL.c_str();
+    info.element = REALSENSE_ELEMENT.c_str();
     info.stream = stream.c_str();
     info.kv_items = entry_items;
     info.n_kv_items = sizeof(entry_items)/sizeof(struct redis_xread_kv_item);
@@ -253,7 +253,7 @@ std::vector<uint8_t> get_realsense_data(
 int main(int argc, char **argv)
 {
     redisContext *ctx = redis_context_init();
-    struct element *element = element_init(ctx, "realsense");
+    struct element *element = element_init(ctx, "transform_estimation");
     if (element == NULL) {
         fprintf(stderr, "Failed to create element!\n");
         return 1;
