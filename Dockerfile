@@ -4,10 +4,13 @@ FROM elementaryrobotics/element-realsense-base:d570c21bfb1142631a11bfcc697757c15
 #	section so that we have the source
 ADD . /code
 
+# Build transformation_estimation
+WORKDIR /code
+RUN make
+
 #
 # Install python dependencies
 #
-WORKDIR /code
 RUN pip3 install -r requirements.txt
 
 # Finally, specify the command we should run when the app is launched

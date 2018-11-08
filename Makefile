@@ -14,7 +14,7 @@ CXX:=g++
 BUILD_DIR:=build
 
 # Location of the sources and the sources themselves
-SRC_DIR := src
+SRC_DIR := realsense
 SRCS := $(wildcard $(SRC_DIR)/*.cpp)
 OBJS := $(addprefix $(BUILD_DIR)/,$(notdir $(SRCS:.cpp=.o)))
 vpath %.cpp $(sort $(dir $(SRCS)))
