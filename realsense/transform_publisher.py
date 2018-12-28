@@ -3,7 +3,7 @@ import subprocess
 import time
 import threading
 from atom import Element
-from atom.messages import Response
+from atom.messages import Response, LogLevel
 
 
 TRANSFORM_FILE_PATH = "data/transform.csv"
@@ -62,7 +62,7 @@ if __name__ == "__main__":
                         transform = load_transform_from_file(TRANSFORM_FILE_PATH)
                         transform_last_loaded = time.time()
                     except Exception as e:
-                        print(e)
+                        element.log(LogLevel.ERR, str(e))
 
             element.entry_write("transform", transform, maxlen=FPS)
             time.sleep(max(1/FPS - (time.time() - start_time), 0))

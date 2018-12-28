@@ -182,6 +182,7 @@ cv::Mat get_distortion(std::vector<cv::Point3f> objpoints,
 //
 ////////////////////////////////////////////////////////////////////////////////
 bool realsense_data_cb(
+    const char *id,
     const struct redis_xread_kv_item *kv_items,
     int n_kv_items,
     void *user_data)

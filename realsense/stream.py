@@ -3,7 +3,7 @@ import numpy as np
 import pyrealsense2 as rs
 import time
 from atom import Element
-from atom.messages import Response
+from atom.messages import Response, LogLevel
 
 
 DEPTH_SHAPE = (640, 480)
@@ -11,7 +11,7 @@ COLOR_SHAPE = (640, 480)
 FPS = 30
 
 
-def rs_intrinsics_to_dict(rs_intrinsicss):
+def rs_intrinsics_to_dict(rs_intrinsics):
     return {
         "width": rs_intrinsics.width,
         "height": rs_intrinsics.height,
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     intrinsics = rs_intrinsics_to_dict(rs_intrinsics)
 
     element = Element("realsense")
-    print("Realsense started. Publishing frames.")
+    element.log(LogLevel.INFO, "Realsense started. Publishing frames.")
     try:
         while True:
             start_time = time.time()
