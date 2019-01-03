@@ -1,20 +1,23 @@
+## realsense
+
 ### Overview
 The realsense element obtains data from a realsense device and publishes the color, depth, and pointcloud data on a stream.
 A static transformation between the camera and world is published on a stream and can be updated by following the transform calculation procedure.
 
-### Streams
-| Element Name | Stream Name            | Format            |
-| ------------ | ---------------------- | ----------------- |
-| realsense    | color                  | TIF encoded image |
-| realsense    | depth                  | TIF encoded image |
-| realsense    | pointcloud             | TIF encoded image |
-| realsense    | intrinsics             | Dict              |
-| realsense    | transform              | Dict              |
-
 ### Commands
-| Element Name | Command Name           | Data |
-| ------------ | ---------------------- | ---- |
-| realsense    | calculate_transform    | None |
+| Command Name           | Data | Response |
+| ---------------------- | ---- | -------- |
+| calculate_transform    | None | None     |
+
+
+### Streams
+| Stream                 | Format            |
+| ---------------------- | ----------------- |
+| color                  | TIF encoded image |
+| depth                  | TIF encoded image |
+| pointcloud             | TIF encoded image |
+| intrinsics             | float             |
+| transform              | float             |
 
 
 ### Decoding the image streams
@@ -28,7 +31,6 @@ except IndexError or KeyError:
     raise Exception("Could not get data. Is the realsense element running?")
 color_img = cv2.imdecode(np.frombuffer(color_data, dtype=np.uint8), -1)
 ```
-
 
 ### Static Transform Calculation
 If you would like to use the realsense camera from a static position and convert camera coordinates to world coordinates, you can calculate the transform between the camera space and world space. 
