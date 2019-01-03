@@ -35,7 +35,7 @@ To give our container access to the realsense device over USB, we must pass `pri
           nocopy: true
     depends_on:
       - "nucleus"
-privileged: true
+    privileged: true
 ```
 
 
