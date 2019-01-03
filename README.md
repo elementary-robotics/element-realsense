@@ -20,6 +20,25 @@ A static transformation between the camera and world is published on a stream an
 | transform              | float             |
 
 
+### docker-compose configuration
+To give our container access to the realsense device over USB, we must pass `privileged: true`
+```
+  realsense:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - type: volume
+        source: shared
+        target: /shared
+        volume:
+          nocopy: true
+    depends_on:
+      - "nucleus"
+privileged: true
+```
+
+
 ### Decoding the image streams
 The element writes TIF encoded images to the `color`, `depth`, and `pointcloud` streams.
 They can be decoded by performing the following procedure.
