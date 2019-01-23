@@ -81,7 +81,6 @@ if __name__ == "__main__":
             element.entry_write("pointcloud", {"data": pc_serialized.tobytes()}, maxlen=FPS)
             element.entry_write("intrinsics", intrinsics, maxlen=FPS)
             time.sleep(max(1/FPS - (time.time() - start_time), 0))
-            print(time.time() - start_time)
 
     finally:
         pipeline.stop()
