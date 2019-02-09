@@ -23,7 +23,7 @@ A static transformation between the camera and world is published on a stream an
 ### docker-compose configuration
 To give our container access to the realsense device over USB, we must pass `privileged: true`
 
-```
+```yaml
   realsense:
     build:
       context: .
@@ -44,7 +44,7 @@ To give our container access to the realsense device over USB, we must pass `pri
 The element writes TIF encoded images to the `color`, `depth`, and `pointcloud` streams.
 They can be decoded by performing the following procedure.
 
-```
+```python
 color_data = element.entry_read_n("realsense", "color", 1)
 try:
     color_data = color_data[0]["data"]
