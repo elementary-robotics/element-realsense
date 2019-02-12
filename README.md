@@ -25,9 +25,7 @@ To give our container access to the realsense device over USB, we must pass `pri
 
 ```yaml
   realsense:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: elementaryrobotics/element-realsense
     volumes:
       - type: volume
         source: shared
