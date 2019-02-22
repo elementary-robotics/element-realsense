@@ -48,6 +48,7 @@ if __name__ == "__main__":
 
     element = Element("realsense")
     element.log(LogLevel.INFO, "Realsense started. Publishing frames.")
+    element.entry_write("intrinsics", intrinsics, maxlen=FPS, serialize=True)
     try:
         while True:
             start_time = time.time()
@@ -79,7 +80,6 @@ if __name__ == "__main__":
             element.entry_write("color", {"data": color_serialized.tobytes()}, maxlen=FPS)
             element.entry_write("depth", {"data": depth_serialized.tobytes()}, maxlen=FPS)
             element.entry_write("pointcloud", {"data": pc_serialized.tobytes()}, maxlen=FPS)
-            element.entry_write("intrinsics", intrinsics, maxlen=FPS)
             time.sleep(max(1/FPS - (time.time() - start_time), 0))
 
     finally:
