@@ -51,6 +51,15 @@ except IndexError or KeyError:
 color_img = cv2.imdecode(np.frombuffer(color_data, dtype=np.uint8), -1)
 ```
 
+
+### Data Format
+| Image Type |    Size   | Data Type |       Unit      |
+| ---------- | --------- | --------- | --------------- |
+| color      | 480x640x3 | uint8     |  Intensity      |
+| depth      | 480x640x1 | uint16    | Distance in mm  |
+| pointcloud | 307200x3  | float32   | Distance in m   |
+
+
 ### Static Transform Calculation
 If you would like to use the realsense camera from a static position and convert camera coordinates to world coordinates, you can calculate the transform between the camera space and world space. 
 
