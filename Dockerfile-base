@@ -1,6 +1,6 @@
 FROM elementaryrobotics/atom
 
-ARG RS_VERSION=v2.16.5
+ARG RS_VERSION=v2.17.0
 
 #
 # Build and install librealsense
