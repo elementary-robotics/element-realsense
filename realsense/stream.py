@@ -1,6 +1,9 @@
 import cv2
+import math
 import numpy as np
+import os
 import pyrealsense2 as rs
+import scipy.ndimage as ndimage
 import time
 from atom import Element
 from atom.messages import Response, LogLevel
@@ -8,7 +11,7 @@ from atom.messages import Response, LogLevel
 
 DEPTH_SHAPE = (640, 480)
 COLOR_SHAPE = (640, 480)
-FPS = 15
+FPS = 30
 
 
 def rs_intrinsics_to_dict(rs_intrinsics):
@@ -23,6 +26,11 @@ def rs_intrinsics_to_dict(rs_intrinsics):
 
 
 if __name__ == "__main__":
+    try:
+        rotation = int(os.environ["ROTATION"])
+    except KeyError or ValueError:
+        rotation = None
+
     pipeline = rs.pipeline()
 
     # Create a config and configure the pipeline to stream
@@ -72,6 +80,11 @@ if __name__ == "__main__":
             vertices = np.asanyarray(points.get_vertices())
 
             vertices = vertices.view(np.float32).reshape(vertices.shape + (-1,))
+
+            if rotation is not None:
+                depth_image = ndimage.rotate(depth_image, rotation)
+                color_image = ndimage.rotate(color_image, rotation)
+                # TODO: Apply rotation to pointcloud
 
             _, color_serialized = cv2.imencode(".tif", color_image)
             _, depth_serialized = cv2.imencode(".tif", depth_image)
