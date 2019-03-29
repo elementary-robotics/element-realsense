@@ -1,14 +1,15 @@
 import cv2
+import math
 import numpy as np
+import os
 import pyrealsense2 as rs
 import time
 from atom import Element
 from atom.messages import Response, LogLevel
 
-
 DEPTH_SHAPE = (640, 480)
 COLOR_SHAPE = (640, 480)
-FPS = 15
+FPS = 30
 
 
 def rs_intrinsics_to_dict(rs_intrinsics):
@@ -23,6 +24,17 @@ def rs_intrinsics_to_dict(rs_intrinsics):
 
 
 if __name__ == "__main__":
+    try:
+        rotation = int(os.environ["ROTATION"])
+        if rotation % 90 != 0:
+            raise ValueError()
+    except ValueError:
+        error_msg = "Rotation must be an integer value that is a multiple of 90!"
+        element.log(LogLevel.ERR, error_msg)
+        raise ValueError(error_msg)
+    except KeyError:
+        rotation = None
+
     pipeline = rs.pipeline()
 
     # Create a config and configure the pipeline to stream
@@ -73,6 +85,11 @@ if __name__ == "__main__":
 
             vertices = vertices.view(np.float32).reshape(vertices.shape + (-1,))
 
+            if rotation is not None:
+                depth_image = np.rot90(depth_image, k=rotation / 90)
+                color_image = np.rot90(color_image, k=rotation / 90)
+                # TODO: Apply rotation to pointcloud
+
             _, color_serialized = cv2.imencode(".tif", color_image)
             _, depth_serialized = cv2.imencode(".tif", depth_image)
             _, pc_serialized = cv2.imencode(".tif", vertices)
@@ -80,7 +97,7 @@ if __name__ == "__main__":
             element.entry_write("color", {"data": color_serialized.tobytes()}, maxlen=FPS)
             element.entry_write("depth", {"data": depth_serialized.tobytes()}, maxlen=FPS)
             element.entry_write("pointcloud", {"data": pc_serialized.tobytes()}, maxlen=FPS)
-            time.sleep(max(1/FPS - (time.time() - start_time), 0))
+            time.sleep(max(1 / FPS - (time.time() - start_time), 0))
 
     finally:
         pipeline.stop()
