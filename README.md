@@ -38,7 +38,7 @@ To give our container access to the realsense device over USB, we must pass `pri
     environment:
       - "ROTATION=0"
 ```
-The rotation of the image can be configured by configuring the `ROTATION` variable in the `environment` section, where the value is the rotation of the image in degrees.
+The rotation of the color and depth images can be configured through the `ROTATION` variable in the `environment` section, where the value is the rotation of the image in degrees that is a multiple of 90. 
 
 
 ### Decoding the image streams
