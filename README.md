@@ -35,7 +35,10 @@ To give our container access to the realsense device over USB, we must pass `pri
     depends_on:
       - "nucleus"
     privileged: true
+    environment:
+      - "ROTATION=0"
 ```
+The rotation of the image can be configured by configuring the `ROTATION` variable in the `environment` section, where the value is the rotation of the image in degrees.
 
 
 ### Decoding the image streams
