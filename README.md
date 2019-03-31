@@ -1,5 +1,9 @@
 ## realsense
 
+### Build Status
+
+[![CircleCI](https://circleci.com/gh/elementary-robotics/element-realsense.svg?style=svg&circle-token=381050538b00f6e885ccbc54eb327165be627eef)](https://circleci.com/gh/elementary-robotics/element-realsense)
+
 ### Overview
 The realsense element obtains data from a realsense device and publishes the color, depth, and pointcloud data on a stream.
 A static transformation between the camera and world is published on a stream and can be updated by following the transform calculation procedure.
@@ -38,7 +42,7 @@ To give our container access to the realsense device over USB, we must pass `pri
     environment:
       - "ROTATION=0"
 ```
-The rotation of the color and depth images can be configured through the `ROTATION` variable in the `environment` section, where the value is the rotation of the image in degrees that is a multiple of 90. 
+The rotation of the color and depth images can be configured through the `ROTATION` variable in the `environment` section, where the value is the rotation of the image in degrees that is a multiple of 90.
 
 
 ### Decoding the image streams
@@ -64,7 +68,7 @@ color_img = cv2.imdecode(np.frombuffer(color_data, dtype=np.uint8), -1)
 
 
 ### Static Transform Calculation
-If you would like to use the realsense camera from a static position and convert camera coordinates to world coordinates, you can calculate the transform between the camera space and world space. 
+If you would like to use the realsense camera from a static position and convert camera coordinates to world coordinates, you can calculate the transform between the camera space and world space.
 
 First, let's estimate the transform.
 1. Place the [checkerboard](https://raw.githubusercontent.com/elementary-robotics/element-realsense/master/data/checkerboard.png?token=AHgfVAAEjyS03qR-Gb_E2a8Q39t65juDks5b7J0ywA%3D%3D) within the field of view of the realsense camera.
