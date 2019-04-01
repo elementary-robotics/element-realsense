@@ -25,7 +25,7 @@ A static transformation between the camera and world is published on a stream an
 
 ### Installation Instructions
 
-Please clone the repo ![librealsense](https://github.com/IntelRealSense/librealsense) on your local machine and follow the below steps to build and apply patched kernel modules for: <br />
+Please clone the repo [librealsense](https://github.com/IntelRealSense/librealsense) on your local machine and follow the below steps to build and apply patched kernel modules for: <br />
 
 * **Ubuntu 14/16/18 with LTS kernel**
   script will download, patch and build realsense-affected kernel modules (drivers).<br />
