@@ -25,7 +25,7 @@ A static transformation between the camera and world is published on a stream an
 
 ### Installation Instructions
 
-Please clone the repo ![librealsense](https://github.com/IntelRealSense/librealsense) and follow the below steps to build and apply patched kernel modules for: <br />
+Please clone the repo ![librealsense](https://github.com/IntelRealSense/librealsense) on your local machine and follow the below steps to build and apply patched kernel modules for: <br />
 
 * **Ubuntu 14/16/18 with LTS kernel**
   script will download, patch and build realsense-affected kernel modules (drivers).<br />
@@ -55,6 +55,10 @@ Please clone the repo ![librealsense](https://github.com/IntelRealSense/libreals
       `sudo dmesg | tail -n 50`<br />
     The log should indicate that a new uvcvideo driver has been registered.
        Refer to [Troubleshooting](#Troubleshooting) in case of errors/warning reports.
+
+> Note: If you face any installation error like `videobuf2 core is in use` that might prevent linux from releasing the drivers, please do it manually by running the following commands.
+`sudo modprobe -r uvcvideo` <br/>
+`sudo modprobe -r videobuf2_core` and reapply the patch.
 
 
 ### docker-compose configuration
