@@ -23,6 +23,39 @@ A static transformation between the camera and world is published on a stream an
 | intrinsics             | float             |
 | transform              | float             |
 
+### Installation Instructions
+
+Please clone the repo ![librealsense](https://github.com/IntelRealSense/librealsense) and follow the below steps to build and apply patched kernel modules for: <br />
+
+* **Ubuntu 14/16/18 with LTS kernel**
+  script will download, patch and build realsense-affected kernel modules (drivers).<br />
+  Then it will attempt to insert the patched module instead of the active one. If failed
+  the original uvc modules will be restored. `./scripts/patch-realsense-ubuntu-lts.sh` <br />
+
+* **Ubuntu with Kernel 4.16**
+
+  `./scripts/patch-ubuntu-kernel-4.16.sh`<br />
+
+* **Intel® Joule™ with Ubuntu**
+  Based on the custom kernel provided by Canonical Ltd.
+
+  `./scripts/patch-realsense-ubuntu-xenial-joule.sh`<br />
+* **Arch-based distributions**
+  * You need to install the [base-devel](https://www.archlinux.org/groups/x86_64/base-devel/) package group.
+  * You also need to install the matching linux-headers as well (i.e.: linux-lts-headers for the linux-lts kernel).<br />
+    * Navigate to the scripts folder  `cd ./scripts/`<br />
+    * Then run the following script to patch the uvc module: `./patch-arch.sh`<br /><br />
+* **Odroid XU4 with Ubuntu 16.04 4.14 image**
+  Based on the custom kernel provided by Hardkernel
+
+  `./scripts/patch-realsense-ubuntu-odroid.sh`<br />
+  Some additional details on the Odroid installation can also be found in [installation_odroid.md](https://github.com/IntelRealSense/librealsense/blob/master/doc/installation_odroid.md)
+
+> Check the patched modules installation by examining the generated log as well as inspecting the latest entries in kernel log:<br />
+      `sudo dmesg | tail -n 50`<br />
+    The log should indicate that a new uvcvideo driver has been registered.
+       Refer to [Troubleshooting](#Troubleshooting) in case of errors/warning reports.
+
 
 ### docker-compose configuration
 To give our container access to the realsense device over USB, we must pass `privileged: true`
