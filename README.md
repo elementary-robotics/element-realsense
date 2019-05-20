@@ -20,8 +20,10 @@ A static transformation between the camera and world is published on a stream an
 | color                  | TIF encoded image |
 | depth                  | TIF encoded image |
 | pointcloud             | TIF encoded image |
-| intrinsics             | float             |
-| transform              | float             |
+| intrinsics             | dict of floats    |
+| transform              | dict of floats    |
+| accel                  | dict of floats    |
+| gyro                   | dict of floats    |
 
 ### Installation Instructions
 
