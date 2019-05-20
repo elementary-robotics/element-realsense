@@ -3,6 +3,7 @@ version: "3.2"
 services:
 
   nucleus:
+    container_name: nucleus
     image: elementaryrobotics/nucleus
     volumes:
       - type: volume
@@ -13,6 +14,7 @@ services:
     command: ./launch.sh
 
   realsense:
+    container_name: realsense
     build:
       context: .
       dockerfile: Dockerfile
