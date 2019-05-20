@@ -24,28 +24,9 @@ services:
         target: /shared
         volume:
           nocopy: true
-      - ".:/development"
     depends_on:
       - "nucleus"
-    environment:
-      - "ROTATION=180"
     privileged: true
-
-  stream-viewer:
-    container_name: stream-viewer
-    image: elementaryrobotics/element-stream-viewer
-    volumes:
-      - type: volume
-        source: shared
-        target: /shared
-        volume:
-          nocopy: true
-      - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
-    environment:
-      - "DISPLAY"
-      - "QT_X11_NO_MITSHM=1"  
-    depends_on:
-      - "nucleus"
 
 volumes:
   shared:
