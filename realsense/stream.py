@@ -37,13 +37,23 @@ if __name__ == "__main__":
 
     pipeline = rs.pipeline()
 
-    # Create a config and configure the pipeline to stream
-    # different resolutions of color and depth streams
-    config = rs.config()
-    config.enable_stream(rs.stream.depth, DEPTH_SHAPE[0], DEPTH_SHAPE[1], rs.format.z16, FPS)
-    config.enable_stream(rs.stream.color, COLOR_SHAPE[0], COLOR_SHAPE[1], rs.format.bgr8, FPS)
+    # Attempt to stream accel and gyro data, which requires d435i
+    # If we can't then we revert to only streaming depth and color
+    try:
+        config = rs.config()
+        config.enable_stream(rs.stream.depth, DEPTH_SHAPE[0], DEPTH_SHAPE[1], rs.format.z16, FPS)
+        config.enable_stream(rs.stream.color, COLOR_SHAPE[0], COLOR_SHAPE[1], rs.format.bgr8, FPS)
+        config.enable_stream(rs.stream.accel)
+        config.enable_stream(rs.stream.gyro)
+        profile = pipeline.start(config)
+        is_d435i = True
+    except RuntimeError:
+        config = rs.config()
+        config.enable_stream(rs.stream.depth, DEPTH_SHAPE[0], DEPTH_SHAPE[1], rs.format.z16, FPS)
+        config.enable_stream(rs.stream.color, COLOR_SHAPE[0], COLOR_SHAPE[1], rs.format.bgr8, FPS)
+        profile = pipeline.start(config)
+        is_d435i = False
 
-    profile = pipeline.start(config)
 
     # Getting the depth sensor's depth scale (see rs-align example for explanation)
     depth_sensor = profile.get_device().first_depth_sensor()
@@ -93,6 +103,14 @@ if __name__ == "__main__":
             _, color_serialized = cv2.imencode(".tif", color_image)
             _, depth_serialized = cv2.imencode(".tif", depth_image)
             _, pc_serialized = cv2.imencode(".tif", vertices)
+
+            if is_d435i:
+                accel = frames[2].as_motion_frame().get_motion_data()
+                gyro = frames[3].as_motion_frame().get_motion_data()
+                accel_data = {"x": accel.x, "y": accel.y, "z": accel.z}
+                gyro_data = {"x": gyro.x, "y": gyro.y, "z": gyro.z}
+                element.entry_write("accel", accel_data, serialize=True, maxlen=FPS)
+                element.entry_write("gyro", gyro_data, serialize=True, maxlen=FPS)
 
             element.entry_write("color", {"data": color_serialized.tobytes()}, maxlen=FPS)
             element.entry_write("depth", {"data": depth_serialized.tobytes()}, maxlen=FPS)

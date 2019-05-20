@@ -1,4 +1,4 @@
-FROM elementaryrobotics/element-realsense-base:e38a6f4251488e40daafe9d07052639a59e92a22
+FROM elementaryrobotics/element-realsense-base:a1f2df454a7dc6d307a3591fee2357d0bb5471c6
 
 # Want to copy over the contents of this repo to the code
 #	section so that we have the source
