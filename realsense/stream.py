@@ -6,22 +6,11 @@ import pyrealsense2 as rs
 import time
 from atom import Element
 from atom.messages import Response, LogLevel
+from contracts import IntrinsicsStreamContract
 
 DEPTH_SHAPE = (640, 480)
 COLOR_SHAPE = (640, 480)
 FPS = 30
-
-
-def rs_intrinsics_to_dict(rs_intrinsics):
-    return {
-        "width": rs_intrinsics.width,
-        "height": rs_intrinsics.height,
-        "ppx": rs_intrinsics.ppx,
-        "ppy": rs_intrinsics.ppy,
-        "fx": rs_intrinsics.fx,
-        "fy": rs_intrinsics.fy,
-    }
-
 
 if __name__ == "__main__":
     try:
@@ -66,11 +55,18 @@ if __name__ == "__main__":
 
     rs_pc = rs.pointcloud()
     rs_intrinsics = profile.get_stream(rs.stream.color).as_video_stream_profile().get_intrinsics()
-    intrinsics = rs_intrinsics_to_dict(rs_intrinsics)
+    intrinsics = IntrinsicsStreamContract(
+        width=rs_intrinsics.width,
+        height=rs_intrisics.height,
+        ppx=rs_intrinsics.ppx,
+        ppy=rs_intrinsics.ppy,
+        fx=rs_intrinsics.fx,
+        fy=rs_intrinsics.fy
+    )
 
     element = Element("realsense")
     element.log(LogLevel.INFO, "Realsense started. Publishing frames.")
-    element.entry_write("intrinsics", intrinsics, maxlen=FPS, serialize=True)
+    element.entry_write(IntrinsicsStreamContract.STREAM_NAME, intrinsics.to_dict(), maxlen=FPS, serialize=True)
     try:
         while True:
             start_time = time.time()
@@ -107,14 +103,14 @@ if __name__ == "__main__":
             if is_d435i:
                 accel = frames[2].as_motion_frame().get_motion_data()
                 gyro = frames[3].as_motion_frame().get_motion_data()
-                accel_data = {"x": accel.x, "y": accel.y, "z": accel.z}
-                gyro_data = {"x": gyro.x, "y": gyro.y, "z": gyro.z}
-                element.entry_write("accel", accel_data, serialize=True, maxlen=FPS)
-                element.entry_write("gyro", gyro_data, serialize=True, maxlen=FPS)
+                accel_data = AccelStreamContract(x=accel.x, y=accel.y, z=accel.z)
+                gyro_data = GyroStreamContract(x=gyro.x, y=gyro.y, z=gyro.z)
+                element.entry_write(AccelStreamContract.STREAM_NAME, accel_data, serialize=True, maxlen=FPS)
+                element.entry_write(GyroStreamContract.STREAM_NAME, gyro_data, serialize=True, maxlen=FPS)
 
-            element.entry_write("color", {"data": color_serialized.tobytes()}, maxlen=FPS)
-            element.entry_write("depth", {"data": depth_serialized.tobytes()}, maxlen=FPS)
-            element.entry_write("pointcloud", {"data": pc_serialized.tobytes()}, maxlen=FPS)
+            element.entry_write(ColorStreamContract.STREAM_NAME, ColorStreamContract(data=color_serialized.tobytes()).to_dict(), maxlen=FPS)
+            element.entry_write(DepthStreamContract.STREAM_NAME, DepthStreamContract(data=depth_serialized.tobytes()).to_dict(), maxlen=FPS)
+            element.entry_write(PointCloudStreamContract.STREAM_NAME, PointCloudStreamContract(data=pc_serialized.tobytes()).to_dict(), maxlen=FPS)
             time.sleep(max(1 / FPS - (time.time() - start_time), 0))
 
     finally:

@@ -4,7 +4,7 @@ import time
 import threading
 from atom import Element
 from atom.messages import Response, LogLevel
-
+from contracts import TransformStreamContract
 
 TRANSFORM_FILE_PATH = "data/transform.csv"
 CALIBRATION_CLIENT_PATH = "build/transform_estimation"
@@ -20,12 +20,10 @@ def load_transform_from_file(fname):
     """
     with open(fname, "r") as f:
         transform_list = [float(v) for v in f.readlines()[-1].split(",")]
-        transform = {
-            "x": transform_list[0], "y": transform_list[1], "z": transform_list[2],
-            "qx": transform_list[3], "qy": transform_list[4],
-            "qz": transform_list[5], "qw": transform_list[6],
-        }
-        return transform
+        return TransformStreamContract(
+            x=transform_list[0], y=transform_list[1], z=transform_list[2],
+            qx=transform_list[3], qy=transform_list[4], qz=transform_list[5], qw=transform_list[6]
+        )
 
 
 def run_transform_estimator(*args):
@@ -35,13 +33,10 @@ def run_transform_estimator(*args):
     process = subprocess.Popen(CALIBRATION_CLIENT_PATH, stderr=subprocess.PIPE)
     out, err = process.communicate()
     return Response(err_code=process.returncode, err_str=err.decode())
-        
+
 
 if __name__ == "__main__":
-    transform = {
-        "x": 0, "y": 0, "z": 0,
-        "qx": 0, "qy": 0, "qz": 0, "qw": 1,
-    }
+    transform_ = TransformStreamContract(x=0, y=0, z=0, qx=0, qy=0, qz=0, qw=1)
     transform_last_loaded = 0
 
     element = Element("realsense")
@@ -64,7 +59,7 @@ if __name__ == "__main__":
                     except Exception as e:
                         element.log(LogLevel.ERR, str(e))
 
-            element.entry_write("transform", transform, maxlen=FPS)
+            element.entry_write(TransformStreamContract.STREAM_NAME, transform.to_dict(), maxlen=FPS)
             time.sleep(max(1/FPS - (time.time() - start_time), 0))
 
     finally:

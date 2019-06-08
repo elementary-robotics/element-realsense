@@ -1,3 +1,4 @@
+lazycontract==0.9.6
 numpy==1.15.2
 opencv-python==3.4.3.18
 six==1.11.0
