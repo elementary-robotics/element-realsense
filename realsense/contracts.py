@@ -1,4 +1,4 @@
-from lazycontract import LazyContract, LazyProperty, ListProperty, FloatProperty, IntProperty
+from lazycontract import LazyContract, LazyProperty, FloatProperty, IntegerProperty
 
 class BinaryProperty(LazyProperty):
     _type = bytes
@@ -9,26 +9,26 @@ class BinaryProperty(LazyProperty):
 class IntrinsicsStreamContract(LazyContract):
     STREAM_NAME = "intrinsics"
 
-    width = IntProperty(required=True)
-    height = IntProperty(required=True)
-    ppx = IntProperty(required=True)
-    ppy = IntProperty(required=True)
-    fx = IntProperty(required=True)
-    fy = IntProperty(required=True)
+    width = IntegerProperty(required=True)
+    height = IntegerProperty(required=True)
+    ppx = IntegerProperty(required=True)
+    ppy = IntegerProperty(required=True)
+    fx = IntegerProperty(required=True)
+    fy = IntegerProperty(required=True)
 
 class AccelStreamContract(LazyContract):
     STREAM_NAME = "accel"
 
-    x = IntProperty(required=True)
-    y = IntProperty(required=True)
-    z = IntProperty(required=True)
+    x = IntegerProperty(required=True)
+    y = IntegerProperty(required=True)
+    z = IntegerProperty(required=True)
 
 class GyroStreamContract(LazyContract):
     STREAM_NAME = "gyro"
 
-    x = IntProperty(required=True)
-    y = IntProperty(required=True)
-    z = IntProperty(required=True)
+    x = IntegerProperty(required=True)
+    y = IntegerProperty(required=True)
+    z = IntegerProperty(required=True)
 
 class ColorStreamContract(LazyContract):
     STREAM_NAME = "color"
@@ -48,9 +48,9 @@ class PointCloudStreamContract(LazyContract):
 class TransformStreamContract(LazyContract):
     STREAM_NAME = "transform"
 
-    x = IntProperty(required=True)
-    y = IntProperty(required=True)
-    z = IntProperty(required=True)
+    x = IntegerProperty(required=True)
+    y = IntegerProperty(required=True)
+    z = IntegerProperty(required=True)
     qx = FloatProperty(required=True)
     qy = FloatProperty(required=True)
     qz = FloatProperty(required=True)

@@ -36,7 +36,7 @@ def run_transform_estimator(*args):
 
 
 if __name__ == "__main__":
-    transform_ = TransformStreamContract(x=0, y=0, z=0, qx=0, qy=0, qz=0, qw=1)
+    transform = TransformStreamContract(x=0, y=0, z=0, qx=0, qy=0, qz=0, qw=1)
     transform_last_loaded = 0
 
     element = Element("realsense")
