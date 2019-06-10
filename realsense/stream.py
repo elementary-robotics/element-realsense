@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     element = Element("realsense")
     element.log(LogLevel.INFO, "Realsense started. Publishing frames.")
-    element.entry_write(IntrinsicsStreamContract.STREAM_NAME, intrinsics.to_dict(), maxlen=FPS, serialize=True)
+    element.entry_write(IntrinsicsStreamContract.STREAM_NAME, intrinsics.to_dict(), serialize=IntrinsicsStreamContract.SERIALIZE, maxlen=FPS)
     try:
         while True:
             start_time = time.time()
@@ -106,12 +106,15 @@ if __name__ == "__main__":
                 gyro = frames[3].as_motion_frame().get_motion_data()
                 accel_data = AccelStreamContract(x=accel.x, y=accel.y, z=accel.z)
                 gyro_data = GyroStreamContract(x=gyro.x, y=gyro.y, z=gyro.z)
-                element.entry_write(AccelStreamContract.STREAM_NAME, accel_data.to_dict(), serialize=True, maxlen=FPS)
-                element.entry_write(GyroStreamContract.STREAM_NAME, gyro_data.to_dict(), serialize=True, maxlen=FPS)
+                element.entry_write(AccelStreamContract.STREAM_NAME, accel_data.to_dict(), serialize=AccelStreamContract.SERIALIZE, maxlen=FPS)
+                element.entry_write(GyroStreamContract.STREAM_NAME, gyro_data.to_dict(), serialize=GyroStreamContract.SERIALIZE, maxlen=FPS)
 
-            element.entry_write(ColorStreamContract.STREAM_NAME, ColorStreamContract(data=color_serialized.tobytes()).to_dict(), maxlen=FPS)
-            element.entry_write(DepthStreamContract.STREAM_NAME, DepthStreamContract(data=depth_serialized.tobytes()).to_dict(), maxlen=FPS)
-            element.entry_write(PointCloudStreamContract.STREAM_NAME, PointCloudStreamContract(data=pc_serialized.tobytes()).to_dict(), maxlen=FPS)
+            color_contract = ColorStreamContract(data=color_serialized.tobytes())
+            depth_contract = DepthStreamContract(data=depth_serialized.tobytes())
+            pc_contract = PointCloudStreamContract(data=pc_serialized.tobytes())
+            element.entry_write(ColorStreamContract.STREAM_NAME, color_contract.to_dict(), serialize=ColorStreamContract.SERIALIZE, maxlen=FPS)
+            element.entry_write(DepthStreamContract.STREAM_NAME, depth_contract.to_dict(), serialize=DepthStreamContract.SERIALIZE, maxlen=FPS)
+            element.entry_write(PointCloudStreamContract.STREAM_NAME, pc_contract.to_dict(), serialize=PointCloudStreamContract.SERIALIZE, maxlen=FPS)
             time.sleep(max(1 / FPS - (time.time() - start_time), 0))
 
     finally:

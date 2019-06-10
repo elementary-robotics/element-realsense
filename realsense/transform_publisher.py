@@ -59,7 +59,12 @@ if __name__ == "__main__":
                     except Exception as e:
                         element.log(LogLevel.ERR, str(e))
 
-            element.entry_write(TransformStreamContract.STREAM_NAME, transform.to_dict(), maxlen=FPS)
+            element.entry_write(
+                TransformStreamContract.STREAM_NAME,
+                transform.to_dict(),
+                serialize=TransformStreamContract.SERIALIZE,
+                maxlen=FPS
+            )
             time.sleep(max(1/FPS - (time.time() - start_time), 0))
 
     finally:

@@ -1,13 +1,10 @@
 from lazycontract import LazyContract, LazyProperty, FloatProperty, IntegerProperty
-
-class BinaryProperty(LazyProperty):
-    _type = bytes
-    def deserialize(self, obj):
-        return obj if isinstance(obj, self._type) else None
+from atom.contracts import BinaryProperty
 
 # Contracts for publishing to streams
 class IntrinsicsStreamContract(LazyContract):
     STREAM_NAME = "intrinsics"
+    SERIALIZE = True
 
     width = IntegerProperty(required=True)
     height = IntegerProperty(required=True)
@@ -18,6 +15,7 @@ class IntrinsicsStreamContract(LazyContract):
 
 class AccelStreamContract(LazyContract):
     STREAM_NAME = "accel"
+    SERIALIZE = True
 
     x = IntegerProperty(required=True)
     y = IntegerProperty(required=True)
@@ -25,6 +23,7 @@ class AccelStreamContract(LazyContract):
 
 class GyroStreamContract(LazyContract):
     STREAM_NAME = "gyro"
+    SERIALIZE = True
 
     x = IntegerProperty(required=True)
     y = IntegerProperty(required=True)
@@ -32,21 +31,25 @@ class GyroStreamContract(LazyContract):
 
 class ColorStreamContract(LazyContract):
     STREAM_NAME = "color"
+    SERIALIZE = False
 
     data = BinaryProperty(required=True)
 
 class DepthStreamContract(LazyContract):
     STREAM_NAME = "depth"
+    SERIALIZE = False
 
     data = BinaryProperty(required=True)
 
 class PointCloudStreamContract(LazyContract):
     STREAM_NAME = "pointcloud"
+    SERIALIZE = False
 
     data = BinaryProperty(required=True)
 
 class TransformStreamContract(LazyContract):
     STREAM_NAME = "transform"
+    SERIALIZE = True
 
     x = IntegerProperty(required=True)
     y = IntegerProperty(required=True)
