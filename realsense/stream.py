@@ -7,7 +7,7 @@ import time
 from atom import Element
 from atom.messages import Response, LogLevel
 from contracts import IntrinsicsStreamContract, AccelStreamContract, GyroStreamContract, \
-ColorStreamContract, DepthStreamContract, PointCloudStreamContract
+ColorStreamContract, DepthStreamContract, PointCloudStreamContract, REALSENSE_ELEMENT
 
 DEPTH_SHAPE = (640, 480)
 COLOR_SHAPE = (640, 480)
@@ -65,7 +65,7 @@ if __name__ == "__main__":
         fy=rs_intrinsics.fy
     )
 
-    element = Element("realsense")
+    element = Element(REALSENSE_ELEMENT)
     element.log(LogLevel.INFO, "Realsense started. Publishing frames.")
     element.entry_write(IntrinsicsStreamContract.STREAM_NAME, intrinsics.to_dict(), serialize=IntrinsicsStreamContract.SERIALIZE, maxlen=FPS)
     try:

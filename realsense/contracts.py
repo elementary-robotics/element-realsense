@@ -1,6 +1,19 @@
 from lazycontract import LazyContract, LazyProperty, FloatProperty, IntegerProperty
 from atom.contracts import BinaryProperty
 
+
+REALSENSE_ELEMENT = "realsense"
+
+# Contracts for commands
+class CalculateTransformCommand:
+    COMMAND_NAME = "calculate_transform"
+
+    class Request(RawContract):
+        SERIALIZE = False
+
+    class Response(RawContract):
+        SERIALIZE = False
+
 # Contracts for publishing to streams
 class IntrinsicsStreamContract(LazyContract):
     STREAM_NAME = "intrinsics"

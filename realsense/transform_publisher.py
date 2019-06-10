@@ -4,7 +4,7 @@ import time
 import threading
 from atom import Element
 from atom.messages import Response, LogLevel
-from contracts import TransformStreamContract
+from contracts import TransformStreamContract, REALSENSE_ELEMENT, CalculateTransformCommand
 
 TRANSFORM_FILE_PATH = "data/transform.csv"
 CALIBRATION_CLIENT_PATH = "build/transform_estimation"
@@ -32,15 +32,19 @@ def run_transform_estimator(*args):
     """
     process = subprocess.Popen(CALIBRATION_CLIENT_PATH, stderr=subprocess.PIPE)
     out, err = process.communicate()
-    return Response(err_code=process.returncode, err_str=err.decode())
+    return Response(err_code=process.returncode, err_str=err.decode(), serialize=CalculateTransformCommand.Response.SERIALIZE)
 
 
 if __name__ == "__main__":
     transform = TransformStreamContract(x=0, y=0, z=0, qx=0, qy=0, qz=0, qw=1)
     transform_last_loaded = 0
 
-    element = Element("realsense")
-    element.command_add("calculate_transform", run_transform_estimator, timeout=2000)
+    element = Element(REALSENSE_ELEMENT)
+    element.command_add(
+        CalculateTransformCommand.COMMAND_NAME,
+        run_transform_estimator,
+        timeout=2000, deserialize=CalculateTransformCommand.Request.SERIALIZE
+    )
     t = threading.Thread(target=element.command_loop, daemon=True)
     t.start()
 
