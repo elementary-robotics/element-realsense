@@ -3,12 +3,13 @@ import math
 import numpy as np
 import os
 import pyrealsense2 as rs
+import threading
 import time
 from atom import Element
 from atom.messages import Response, LogLevel
 from contracts import IntrinsicsStreamContract, AccelStreamContract, GyroStreamContract, \
 ColorStreamContract, DepthStreamContract, PointCloudStreamContract, TransformStreamContract, \
-REALSENSE_ELEMENT
+CalculateTransformCommand, REALSENSE_ELEMENT_NAME
 
 TRANSFORM_FILE_PATH = "data/transform.csv"
 CALIBRATION_CLIENT_PATH = "build/transform_estimation"
@@ -91,7 +92,7 @@ if __name__ == "__main__":
         fy=rs_intrinsics.fy
     )
 
-    element = Element(REALSENSE_ELEMENT)
+    element = Element(REALSENSE_ELEMENT_NAME)
     # Startup command thread
     transform = TransformStreamContract(x=0, y=0, z=0, qx=0, qy=0, qz=0, qw=1)
     transform_last_loaded = 0

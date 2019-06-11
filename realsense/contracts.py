@@ -1,8 +1,8 @@
 from lazycontract import LazyContract, LazyProperty, FloatProperty, IntegerProperty
-from atom.contracts import BinaryProperty
+from atom.contracts import BinaryProperty, RawContract
 
 
-REALSENSE_ELEMENT = "realsense"
+REALSENSE_ELEMENT_NAME = "realsense"
 
 # Contracts for commands
 class CalculateTransformCommand:
