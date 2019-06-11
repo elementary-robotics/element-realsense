@@ -3,6 +3,7 @@ import math
 import numpy as np
 import os
 import pyrealsense2 as rs
+import subprocess
 import threading
 import time
 from atom import Element
