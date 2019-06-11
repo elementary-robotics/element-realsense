@@ -7,11 +7,37 @@ import time
 from atom import Element
 from atom.messages import Response, LogLevel
 from contracts import IntrinsicsStreamContract, AccelStreamContract, GyroStreamContract, \
-ColorStreamContract, DepthStreamContract, PointCloudStreamContract, REALSENSE_ELEMENT
+ColorStreamContract, DepthStreamContract, PointCloudStreamContract, TransformStreamContract, \
+REALSENSE_ELEMENT
 
+TRANSFORM_FILE_PATH = "data/transform.csv"
+CALIBRATION_CLIENT_PATH = "build/transform_estimation"
 DEPTH_SHAPE = (640, 480)
 COLOR_SHAPE = (640, 480)
 FPS = 30
+
+def load_transform_from_file(fname):
+    """
+    Opens specified file, reads transform, and returns as list.
+
+    Args:
+        fname (str): CSV file that stores the transform
+    """
+    with open(fname, "r") as f:
+        transform_list = [float(v) for v in f.readlines()[-1].split(",")]
+        return TransformStreamContract(
+            x=transform_list[0], y=transform_list[1], z=transform_list[2],
+            qx=transform_list[3], qy=transform_list[4], qz=transform_list[5], qw=transform_list[6]
+        )
+
+
+def run_transform_estimator(*args):
+    """
+    Runs the transform estimation procedure, which saves the transform to disk.
+    """
+    process = subprocess.Popen(CALIBRATION_CLIENT_PATH, stderr=subprocess.PIPE)
+    out, err = process.communicate()
+    return Response(err_code=process.returncode, err_str=err.decode(), serialize=CalculateTransformCommand.Response.SERIALIZE)
 
 if __name__ == "__main__":
     try:
@@ -66,7 +92,18 @@ if __name__ == "__main__":
     )
 
     element = Element(REALSENSE_ELEMENT)
+    # Startup command thread
+    transform = TransformStreamContract(x=0, y=0, z=0, qx=0, qy=0, qz=0, qw=1)
+    transform_last_loaded = 0
+    element.command_add(
+        CalculateTransformCommand.COMMAND_NAME,
+        run_transform_estimator,
+        timeout=2000, deserialize=CalculateTransformCommand.Request.SERIALIZE
+    )
+    t = threading.Thread(target=element.command_loop, daemon=True)
+    t.start()
     element.log(LogLevel.INFO, "Realsense started. Publishing frames.")
+
     element.entry_write(IntrinsicsStreamContract.STREAM_NAME, intrinsics.to_dict(), serialize=IntrinsicsStreamContract.SERIALIZE, maxlen=FPS)
     try:
         while True:
@@ -115,6 +152,24 @@ if __name__ == "__main__":
             element.entry_write(ColorStreamContract.STREAM_NAME, color_contract.to_dict(), serialize=ColorStreamContract.SERIALIZE, maxlen=FPS)
             element.entry_write(DepthStreamContract.STREAM_NAME, depth_contract.to_dict(), serialize=DepthStreamContract.SERIALIZE, maxlen=FPS)
             element.entry_write(PointCloudStreamContract.STREAM_NAME, pc_contract.to_dict(), serialize=PointCloudStreamContract.SERIALIZE, maxlen=FPS)
+
+            # Load transform from file if the file exists
+            # and has been modified since we last checked
+            if os.path.exists(TRANSFORM_FILE_PATH):
+                transform_last_modified = os.stat(TRANSFORM_FILE_PATH).st_mtime
+                if transform_last_modified > transform_last_loaded:
+                    try:
+                        transform = load_transform_from_file(TRANSFORM_FILE_PATH)
+                        transform_last_loaded = time.time()
+                    except Exception as e:
+                        element.log(LogLevel.ERR, str(e))
+            element.entry_write(
+                TransformStreamContract.STREAM_NAME,
+                transform.to_dict(),
+                serialize=TransformStreamContract.SERIALIZE,
+                maxlen=FPS
+            )
+
             time.sleep(max(1 / FPS - (time.time() - start_time), 0))
 
     finally:
