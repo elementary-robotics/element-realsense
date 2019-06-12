@@ -43,7 +43,8 @@ def run_transform_estimator(*args):
         data=CalculateTransformCommand.Response().to_data(),
         err_code=process.returncode,
         err_str=err.decode(),
-        serialize=CalculateTransformCommand.Response.SERIALIZE)
+        serialize=CalculateTransformCommand.Response.SERIALIZE
+    )
 
 if __name__ == "__main__":
     try:
