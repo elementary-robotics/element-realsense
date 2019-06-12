@@ -39,7 +39,11 @@ def run_transform_estimator(*args):
     """
     process = subprocess.Popen(CALIBRATION_CLIENT_PATH, stderr=subprocess.PIPE)
     out, err = process.communicate()
-    return Response(err_code=process.returncode, err_str=err.decode(), serialize=CalculateTransformCommand.Response.SERIALIZE)
+    return Response(
+        data=CalculateTransformCommand.Response().to_data(),
+        err_code=process.returncode,
+        err_str=err.decode(),
+        serialize=CalculateTransformCommand.Response.SERIALIZE)
 
 if __name__ == "__main__":
     try:

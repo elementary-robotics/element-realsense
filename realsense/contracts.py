@@ -21,26 +21,26 @@ class IntrinsicsStreamContract(LazyContract):
 
     width = IntegerProperty(required=True)
     height = IntegerProperty(required=True)
-    ppx = IntegerProperty(required=True)
-    ppy = IntegerProperty(required=True)
-    fx = IntegerProperty(required=True)
-    fy = IntegerProperty(required=True)
+    ppx = FloatProperty(required=True)
+    ppy = FloatProperty(required=True)
+    fx = FloatProperty(required=True)
+    fy = FloatProperty(required=True)
 
 class AccelStreamContract(LazyContract):
     STREAM_NAME = "accel"
     SERIALIZE = True
 
-    x = IntegerProperty(required=True)
-    y = IntegerProperty(required=True)
-    z = IntegerProperty(required=True)
+    x = FloatProperty(required=True)
+    y = FloatProperty(required=True)
+    z = FloatProperty(required=True)
 
 class GyroStreamContract(LazyContract):
     STREAM_NAME = "gyro"
     SERIALIZE = True
 
-    x = IntegerProperty(required=True)
-    y = IntegerProperty(required=True)
-    z = IntegerProperty(required=True)
+    x = FloatProperty(required=True)
+    y = FloatProperty(required=True)
+    z = FloatProperty(required=True)
 
 class ColorStreamContract(LazyContract):
     STREAM_NAME = "color"
