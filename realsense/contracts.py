@@ -1,5 +1,5 @@
 from lazycontract import LazyContract, LazyProperty, FloatProperty, IntegerProperty
-from atom.contracts import BinaryProperty, RawContract
+from atom.contracts import BinaryProperty, RawContract, EmptyContract
 
 
 REALSENSE_ELEMENT_NAME = "realsense"
@@ -8,10 +8,10 @@ REALSENSE_ELEMENT_NAME = "realsense"
 class CalculateTransformCommand:
     COMMAND_NAME = "calculate_transform"
 
-    class Request(RawContract):
+    class Request(EmptyContract):
         SERIALIZE = False
 
-    class Response(RawContract):
+    class Response(EmptyContract):
         SERIALIZE = False
 
 # Contracts for publishing to streams
