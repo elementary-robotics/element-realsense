@@ -116,10 +116,6 @@ class Realsense:
                     config.enable_stream(rs.stream.color, self._color_shape[0], self._color_shape[1], rs.format.bgr8, self._fps)
                     profile = self._pipeline.start(config)
                     is_d435i = False
-                # Getting the depth sensor's depth scale (see rs-align example for explanation)
-                # TODO: THESE ARE NOT USED, SHOULD THEY BE REMOVED?
-                depth_sensor = profile.get_device().first_depth_sensor()
-                depth_scale = depth_sensor.get_depth_scale()
 
                 # Publish intrinsics
                 rs_intrinsics = profile.get_stream(rs.stream.color).as_video_stream_profile().get_intrinsics()
