@@ -24,9 +24,12 @@ services:
         target: /shared
         volume:
           nocopy: true
+      - /dev/:/dev/
     depends_on:
       - "nucleus"
     privileged: true
+    environment:
+      PYTHONUNBUFFERED: 'TRUE'
 
 volumes:
   shared:
