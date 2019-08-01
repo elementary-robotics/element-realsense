@@ -256,6 +256,7 @@ class Realsense:
                 time.sleep(self._retry_delay)
 
 if __name__ == "__main__":
+    element_name = os.getenv('ELEMENT_NAME', REALSENSE_ELEMENT_NAME)
     transform_file_path = os.getenv('TRANSFORM_FILE_PATH', 'data/transform.csv')
     calibration_client_path = os.getenv('CALIBRATION_CLIENT_PATH', 'build/transform_estimation')
     depth_shape_x = int(os.getenv('DEPTH_SHAPE_X', '640'))
@@ -274,7 +275,7 @@ if __name__ == "__main__":
             raise ValueError("Rotation must be an integer value that is a multiple of 90!")
 
     realsense = Realsense(
-        element_name=REALSENSE_ELEMENT_NAME,
+        element_name=element_name,
         transform_file_path=transform_file_path,
         calibration_client_path=calibration_client_path,
         depth_shape=(depth_shape_x, depth_shape_y),
