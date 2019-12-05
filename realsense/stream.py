@@ -286,7 +286,7 @@ if __name__ == "__main__":
     element_name = os.getenv('ELEMENT_NAME', REALSENSE_ELEMENT_NAME)
     transform_file_path = os.getenv('TRANSFORM_FILE_PATH', 'data/transform.csv')
     calibration_client_path = os.getenv('CALIBRATION_CLIENT_PATH', 'build/transform_estimation')
-    depth_shape_x = int(os.getenv('DEPTH_SHAPE_X', '640'))
+    depth_shape_x = int(os.getenv('DEPTH_SHAPE_X', '848'))
     depth_shape_y = int(os.getenv('DEPTH_SHAPE_Y', '480'))
     color_shape_x = int(os.getenv('COLOR_SHAPE_X', '640'))
     color_shape_y = int(os.getenv('COLOR_SHAPE_Y', '480'))
