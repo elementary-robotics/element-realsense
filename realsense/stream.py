@@ -15,20 +15,27 @@ CalculateTransformCommand, REALSENSE_ELEMENT_NAME
 
 
 class Realsense:
-    def __init__(self,
-                 element_name,
-                 transform_file_path,
-                 calibration_client_path,
-                 depth_shape,
-                 color_shape,
-                 fps,
-                 rotation,
-                 retry_delay):
+
+    def __init__(
+        self,
+        element_name,
+        transform_file_path,
+        calibration_client_path,
+        depth_shape,
+        color_shape,
+        fps,
+        disparity_shift,
+        depth_units,
+        rotation,
+        retry_delay
+    ):
         self._transform_file_path = transform_file_path
         self._calibration_client_path = calibration_client_path
         self._depth_shape = depth_shape
         self._color_shape = color_shape
         self._fps = fps
+        self.disparity_shift = disparity_shift
+        self.depth_units = depth_units
         self._rotation = rotation
         self._retry_delay = retry_delay
 
@@ -48,7 +55,8 @@ class Realsense:
         self._element.command_add(
             CalculateTransformCommand.COMMAND_NAME,
             self.run_transform_estimator,
-            timeout=2000, deserialize=CalculateTransformCommand.Request.SERIALIZE
+            timeout=2000,
+            deserialize=CalculateTransformCommand.Request.SERIALIZE
         )
 
         # Run command loop
@@ -78,8 +86,13 @@ class Realsense:
         with open(fname, "r") as f:
             transform_list = [float(v) for v in f.readlines()[-1].split(",")]
             return TransformStreamContract(
-                x=transform_list[0], y=transform_list[1], z=transform_list[2],
-                qx=transform_list[3], qy=transform_list[4], qz=transform_list[5], qw=transform_list[6]
+                x=transform_list[0],
+                y=transform_list[1],
+                z=transform_list[2],
+                qx=transform_list[3],
+                qy=transform_list[4],
+                qz=transform_list[5],
+                qw=transform_list[6]
             )
 
     def run_transform_estimator(self, *args):
@@ -100,22 +113,42 @@ class Realsense:
             try:
                 # Try to establish realsense connection
                 self._element.log(LogLevel.INFO, "Attempting to connect to Realsense")
+
+                # Set disparity shift
+                device = rs.context().query_devices()[0]
+                advnc_mode = rs.rs400_advanced_mode(device)
+                depth_table_control_group = advnc_mode.get_depth_table()
+                depth_table_control_group.disparityShift = self.disparity_shift
+                advnc_mode.set_depth_table(depth_table_control_group)
+
                 # Attempt to stream accel and gyro data, which requires d435i
                 # If we can't then we revert to only streaming depth and color
                 try:
                     config = rs.config()
-                    config.enable_stream(rs.stream.depth, self._depth_shape[0], self._depth_shape[1], rs.format.z16, self._fps)
-                    config.enable_stream(rs.stream.color, self._color_shape[0], self._color_shape[1], rs.format.bgr8, self._fps)
+                    config.enable_stream(
+                        rs.stream.depth, self._depth_shape[0], self._depth_shape[1], rs.format.z16, self._fps
+                    )
+                    config.enable_stream(
+                        rs.stream.color, self._color_shape[0], self._color_shape[1], rs.format.bgr8, self._fps
+                    )
                     config.enable_stream(rs.stream.accel)
                     config.enable_stream(rs.stream.gyro)
                     profile = self._pipeline.start(config)
                     is_d435i = True
                 except RuntimeError:
                     config = rs.config()
-                    config.enable_stream(rs.stream.depth, self._depth_shape[0], self._depth_shape[1], rs.format.z16, self._fps)
-                    config.enable_stream(rs.stream.color, self._color_shape[0], self._color_shape[1], rs.format.bgr8, self._fps)
+                    config.enable_stream(
+                        rs.stream.depth, self._depth_shape[0], self._depth_shape[1], rs.format.z16, self._fps
+                    )
+                    config.enable_stream(
+                        rs.stream.color, self._color_shape[0], self._color_shape[1], rs.format.bgr8, self._fps
+                    )
                     profile = self._pipeline.start(config)
                     is_d435i = False
+
+                # Set depth units
+                depth_sensor = profile.get_device().first_depth_sensor()
+                depth_sensor.set_option(rs.option.depth_units, self.depth_units)
 
                 # Publish intrinsics
                 rs_intrinsics = profile.get_stream(rs.stream.color).as_video_stream_profile().get_intrinsics()
@@ -233,10 +266,7 @@ class Realsense:
                     time.sleep(max(1 / self._fps - (time.time() - start_time), 0))
 
             except:
-                self._element.log(
-                    LogLevel.INFO,
-                    "Camera loop threw exception: %s" % (sys.exc_info()[1])
-                )
+                self._element.log(LogLevel.INFO, "Camera loop threw exception: %s" % (sys.exc_info()[1]))
             finally:
                 # If camera fails to init or crashes, update status and retry connection
                 try:
@@ -251,6 +281,7 @@ class Realsense:
                     pass
                 time.sleep(self._retry_delay)
 
+
 if __name__ == "__main__":
     element_name = os.getenv('ELEMENT_NAME', REALSENSE_ELEMENT_NAME)
     transform_file_path = os.getenv('TRANSFORM_FILE_PATH', 'data/transform.csv')
@@ -259,6 +290,8 @@ if __name__ == "__main__":
     depth_shape_y = int(os.getenv('DEPTH_SHAPE_Y', '480'))
     color_shape_x = int(os.getenv('COLOR_SHAPE_X', '640'))
     color_shape_y = int(os.getenv('COLOR_SHAPE_Y', '480'))
+    disparity_shift = int(os.getenv("DISPARITY_SHIFT", "0"))
+    depth_units = float(os.getenv("DEPTH_UNITS", "0.001"))
     fps = int(os.getenv('FPS', '30'))
     retry_delay = float(os.getenv('RETRY_DELAY', '3.0'))
     rotation = os.getenv('ROTATION', None)
@@ -277,6 +310,8 @@ if __name__ == "__main__":
         depth_shape=(depth_shape_x, depth_shape_y),
         color_shape=(color_shape_x, color_shape_y),
         fps=fps,
+        disparity_shift=disparity_shift,
+        depth_units=depth_units,
         rotation=rotation,
         retry_delay=retry_delay
     )
