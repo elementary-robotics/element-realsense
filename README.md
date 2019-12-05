@@ -62,6 +62,11 @@ Please clone the repo [librealsense](https://github.com/IntelRealSense/librealse
 `sudo modprobe -r uvcvideo` <br/>
 `sudo modprobe -r videobuf2_core` and reapply the patch.
 
+### Environment Variables
+- `disparity_shift` increasing this value can decrease the min range of the depth stream at the cost of decreasing the max range. Expects an integer between 0 and 512.
+- `depth_units` This value allows us to adjust the minimum physical unit to allow more granularity in depth data. The standard level of granularity is `0.001` (meters), but it can be decreased to `0.0001` (meters) at the cost of reducing the maximum range to 6.5 meters.
+
+
 
 ### docker-compose configuration
 To give our container access to the realsense device over USB, we must pass `privileged: true`
