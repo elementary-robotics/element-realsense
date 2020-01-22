@@ -109,6 +109,7 @@ class Realsense:
         )
 
     def run_camera_stream(self):
+        retry_count = 0
         while True:
             try:
                 # Try to establish realsense connection
@@ -262,7 +263,7 @@ class Realsense:
                         serialize=TransformStreamContract.SERIALIZE,
                         maxlen=self._fps
                     )
-
+                    retry_count = 0
                     time.sleep(max(1 / self._fps - (time.time() - start_time), 0))
 
             except:
@@ -279,7 +280,36 @@ class Realsense:
                     self._pipeline.stop()
                 except:
                     pass
+                retry_count += 1
                 time.sleep(self._retry_delay)
+                if retry_count > 1:
+                    try:
+                        self._status_lock.acquire()
+                        self._status_is_running = True
+                    finally:
+                        self._status_lock.release()
+                    self._element.log(LogLevel.INFO, "Retry count exceeded, defaulting to dummy image")
+                    depth_image = cv2.imread('gray_image.png', cv2.IMREAD_GRAYSCALE)
+                    color_image = cv2.imread('color_image.png', cv2.IMREAD_COLOR)
+                    _, color_serialized = cv2.imencode(".tif", color_image)
+                    _, depth_serialized = cv2.imencode(".tif", depth_image)
+                    while True:
+                        start_time = time.time()
+                        color_contract = ColorStreamContract(data=color_serialized.tobytes())
+                        depth_contract = DepthStreamContract(data=depth_serialized.tobytes())
+                        self._element.entry_write(
+                            ColorStreamContract.STREAM_NAME,
+                            color_contract.to_dict(),
+                            serialize=ColorStreamContract.SERIALIZE,
+                            maxlen=self._fps
+                        )
+                        self._element.entry_write(
+                            DepthStreamContract.STREAM_NAME,
+                            depth_contract.to_dict(),
+                            serialize=DepthStreamContract.SERIALIZE,
+                            maxlen=self._fps
+                        )
+                        time.sleep(max(1 / self._fps - (time.time() - start_time), 0))
 
 
 if __name__ == "__main__":
