@@ -1,4 +1,4 @@
-FROM elementaryrobotics/atom
+FROM elementaryrobotics/atom:v1.0.1
 
 ARG RS_VERSION=v2.21.0
 
