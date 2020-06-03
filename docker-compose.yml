@@ -13,18 +13,20 @@ services:
     command: ./launch.sh
 
   realsense:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: elementaryrobotics/element-realsense
     volumes:
       - type: volume
         source: shared
         target: /shared
         volume:
           nocopy: true
+      - "/tmp/.X11-unix:/tmp/.X11-unix"
     depends_on:
       - "nucleus"
     privileged: true
+    command: tail -f /dev/null
+    environment:
+      - "DISPLAY=:0"
 
 volumes:
   shared:
