@@ -1,0 +1,10 @@
+# ignore everything
+**
+
+# except
+!/realsense/**
+!/data/**
+!/launch.sh
+!/Makefile
+!/README.md
+!/requirements.txt

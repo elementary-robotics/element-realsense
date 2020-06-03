@@ -4,6 +4,7 @@ FROM elementaryrobotics/element-realsense-base:7969c396b780b4feb43d6845dd346aa81
 #	section so that we have the source
 ADD . /code
 WORKDIR /code
+RUN make
 
 #
 # Install python dependencies

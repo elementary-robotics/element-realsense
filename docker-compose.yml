@@ -25,14 +25,11 @@ services:
         volume:
           nocopy: true
       - /dev/:/dev/
-      - "/tmp/.X11-unix:/tmp/.X11-unix"
-      - ".:/code"
     depends_on:
       - "nucleus"
     privileged: true
     command: tail -f /dev/null
     environment:
-      DISPLAY: :0
       PYTHONUNBUFFERED: 'TRUE'
 
   # Debug tool for monitoring streams
