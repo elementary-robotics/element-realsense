@@ -21,12 +21,35 @@ services:
         volume:
           nocopy: true
       - "/tmp/.X11-unix:/tmp/.X11-unix"
+      - ".:/code"
     depends_on:
       - "nucleus"
     privileged: true
     command: tail -f /dev/null
     environment:
       - "DISPLAY=:0"
+
+  # Debug tool for monitoring streams
+  stream-viewer:
+    container_name: stream-viewer
+    image: elementaryrobotics/element-stream-viewer:latest
+    restart: always
+    logging:
+      options:
+        max-size: '1m'
+        max-file: '5'
+    volumes:
+      - type: volume
+        source: shared
+        target: /shared
+        volume:
+          nocopy: true
+      - "/tmp/.X11-unix:/tmp/.X11-unix"
+    environment:
+      - "DISPLAY=:0"
+      - "QT_X11_NO_MITSHM=1"
+    depends_on:
+      - "nucleus"
 
 volumes:
   shared:
