@@ -3,6 +3,7 @@ version: "3.2"
 services:
 
   nucleus:
+    container_name: nucleus
     image: elementaryrobotics/nucleus
     volumes:
       - type: volume
@@ -13,7 +14,10 @@ services:
     command: ./launch.sh
 
   realsense:
-    image: elementaryrobotics/element-realsense
+    container_name: realsense
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - type: volume
         source: shared
@@ -27,7 +31,8 @@ services:
     privileged: true
     command: tail -f /dev/null
     environment:
-      - "DISPLAY=:0"
+      DISPLAY: :0
+      PYTHONUNBUFFERED: 'TRUE'
 
   # Debug tool for monitoring streams
   stream-viewer:
