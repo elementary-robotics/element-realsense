@@ -24,6 +24,7 @@ services:
         target: /shared
         volume:
           nocopy: true
+      - /dev/:/dev/
       - "/tmp/.X11-unix:/tmp/.X11-unix"
       - ".:/code"
     depends_on:
