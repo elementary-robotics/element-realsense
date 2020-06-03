@@ -3,10 +3,7 @@ FROM elementaryrobotics/element-realsense-base:e38a6f4251488e40daafe9d07052639a5
 # Want to copy over the contents of this repo to the code
 #	section so that we have the source
 ADD . /code
-
-# Build transformation_estimation
 WORKDIR /code
-RUN make
 
 #
 # Install python dependencies
