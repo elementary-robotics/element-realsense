@@ -58,12 +58,12 @@ workflows:
               only: /.*/
 
       # Check Flake8 -- parallel to the build
-      - atom/check_flake8:
-          version: 3.7.0
-          exclude: tests/*,tasks/elementary-task,robot-shared
-          filters:
-            tags:
-              only: /.*/
+      # - atom/check_flake8:
+      #     version: 3.7.0
+      #     exclude: tests/*,tasks/elementary-task,robot-shared
+      #     filters:
+      #       tags:
+      #         only: /.*/
 
       # Deploy development
       - atom/deploy:
