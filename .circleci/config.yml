@@ -1,77 +1,133 @@
+
 version: 2.1
 
+parameters:
+  atom_repo:
+    type: string
+    default: elementaryrobotics/atom
+  atom_version:
+    type: string
+    default: v2.0.0-beta
+  atom_variant:
+    type: string
+    default: opencv
+  dockerhub_repo:
+    type: string
+    default: elementaryrobotics/element-realsense
+
 orbs:
-  atom: elementaryrobotics/atom@0.0.6
-
-jobs:
-  build:
-
-    # VM we're going to use to build the docker container
-    executor: atom/build-classic
-    resource_class: large
-
-    # Variables that are easier to set up here to propagate through
-    # the build script
-    environment:
-
-      # Name of the service in docker-compose.yml
-      DOCKER_COMPOSE_PROJECT_NAME: realsense
-      DOCKER_COMPOSE_SERVICE_NAME: realsense
-
-    steps:
-      - checkout
-
-      # Need to log into docker
-      - atom/docker_login
-      #
-      # Build and launch docker image
-      #
-      - atom/build_and_launch:
-          file: docker-compose.yml
-          service: ${DOCKER_COMPOSE_SERVICE_NAME}
-          image_tag: ${DOCKERHUB_REPO}-${CIRCLE_WORKFLOW_ID}
-      #
-      # Run unit tests
-      #
-      - run:
-          name: Run Unit Tests
-          command: echo "Please write some unit tests!"
-
-      #
-      # Push the image back to DockerHub with build tag
-      #
-      - atom/tag_and_deploy:
-          source_image: ${DOCKERHUB_REPO}-${CIRCLE_WORKFLOW_ID}
-          target_image: ${DOCKERHUB_ORG}/${DOCKERHUB_REPO}
-          target_tag: build-${CIRCLE_WORKFLOW_ID}
+  atom: elementaryrobotics/atom@0.1.9
 
 workflows:
   version: 2
   build-all:
     jobs:
-      - build:
+
+      # Build for intel and ARM
+      - atom/build_buildx:
+          name: "build-<< matrix.platform >>"
+          matrix:
+            parameters:
+              platform: [ amd64, aarch64 ]
+          image_name: << pipeline.parameters.dockerhub_repo >>
+          image_tag: build-<< pipeline.number >>
+          cache_repo: << pipeline.parameters.dockerhub_repo >>
+          cache_tag: cache
+          build_args: --build-arg ATOM_IMAGE=<< pipeline.parameters.atom_repo >>:<< pipeline.parameters.atom_version >>-<< pipeline.parameters.atom_variant >>-<< matrix.platform >>
           filters:
             tags:
               only: /.*/
-      - atom/deploy-master:
+
+      # Test
+      - atom/test:
+          name: "test-<< matrix.platform >>"
+          matrix:
+            parameters:
+              platform: [ amd64, aarch64 ]
+          test_image: << pipeline.parameters.dockerhub_repo >>
+          test_tag: build-<< pipeline.number >>
+          atom_version: << pipeline.parameters.atom_version >>
+          compose_file: .circleci/docker-compose.yml
+          container_name: test-container
+          container_test_dir: /code
+          test_cmd: echo "write some tests!"
           requires:
-            - build
+            - build-<< matrix.platform >>
           filters:
             tags:
               only: /.*/
-            branches:
-              only:
-                - master
-      - atom/deploy-dev:
+
+      # Check Flake8 -- parallel to the build
+      # - atom/check_flake8:
+      #     version: 3.7.0
+      #     exclude: tests/*,tasks/elementary-task,robot-shared
+      #     filters:
+      #       tags:
+      #         only: /.*/
+
+      # Deploy development
+      - atom/deploy:
+          name: "deploy-development-<< matrix.platform >>"
+          source_image: << pipeline.parameters.dockerhub_repo >>
+          source_tag: build-<< pipeline.number >>
+          target_image: << pipeline.parameters.dockerhub_repo >>
+          target_tag: development-<< pipeline.number >>
+          matrix:
+            parameters:
+              platform: [ amd64, aarch64 ]
           requires:
-            - build
+            - build-<< matrix.platform >>
           filters:
             branches:
               ignore:
                 - master
-      - atom/deploy-tag:
+
+      # Deploy latest
+      - atom/deploy:
+          name: "deploy-latest-<< matrix.platform >>"
+          source_image: << pipeline.parameters.dockerhub_repo >>
+          source_tag: build-<< pipeline.number >>
+          target_image: << pipeline.parameters.dockerhub_repo >>
+          target_tag: latest-<< pipeline.number >>
+          matrix:
+            parameters:
+              platform: [ amd64, aarch64 ]
           requires:
-            - build
+            - build-<< matrix.platform >>
+          filters:
+            branches:
+              only:
+                - master
+
+      # Deploy release
+      - atom/deploy_release:
+          name: "deploy-release-<< matrix.platform >>"
+          source_image: << pipeline.parameters.dockerhub_repo >>
+          source_tag: build-<< pipeline.number >>
+          target_image: << pipeline.parameters.dockerhub_repo >>
+          target_tag: ""
+          matrix:
+            parameters:
+              platform: [ amd64, aarch64 ]
+          requires:
+            - build-<< matrix.platform >>
+          filters:
+            branches:
+              only:
+                - latest
+
+      # Deploy tag
+      - atom/deploy:
+          name: "deploy-tag-<< matrix.platform >>"
+          source_image: << pipeline.parameters.dockerhub_repo >>
+          source_tag: build-<< pipeline.number >>
+          target_image: << pipeline.parameters.dockerhub_repo >>
+          target_tag: ${CIRCLE_TAG}
+          matrix:
+            parameters:
+              platform: [ amd64, aarch64 ]
+          requires:
+            - build-<< matrix.platform >>
           filters:
             branches:
               ignore:

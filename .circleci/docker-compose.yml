@@ -1,0 +1,33 @@
+version: "3.2"
+
+services:
+
+  nucleus:
+    container_name: nucleus
+    image: ${NUCLEUS_IMAGE}
+    volumes:
+      - type: volume
+        source: shared
+        target: /shared
+        volume:
+          nocopy: true
+
+  test-container:
+    container_name: test-container
+    image: ${TEST_IMAGE}
+    volumes:
+      - type: volume
+        source: shared
+        target: /shared
+        volume:
+          nocopy: true
+      - ".:/test"
+    depends_on:
+      - "nucleus"
+    command: tail -f /dev/null
+
+volumes:
+  shared:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
